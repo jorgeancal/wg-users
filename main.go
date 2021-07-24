@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"strconv"
+	"strings"
 )
 
 var DIRS = []string{
@@ -34,7 +35,42 @@ func main() {
 
 	if len(os.Args) <= 1 {
 		printHelp()
+		os.Exit(1)
 	}
+
+	var actions = os.Args[1]
+	var users = os.Args[2:]
+
+	switch strings.ToLower(actions) {
+	case "create":
+		createUsers(users)
+	case "update":
+		updateUsers(users)
+	case "delete":
+		deleteUsers(users)
+	case "list":
+		listUsers()
+	case "help":
+		printHelp()
+	default:
+		printHelp()
+	}
+}
+
+func createUsers(users []string) {
+
+}
+
+func updateUsers(users []string) {
+
+}
+
+func deleteUsers(users []string) {
+
+}
+
+func listUsers() {
+
 }
 
 func printHelp() {
