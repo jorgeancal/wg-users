@@ -5,7 +5,6 @@ import (
 	"os"
 	"os/exec"
 	"strconv"
-	"strings"
 )
 
 var DIRS = []string{
@@ -41,54 +40,7 @@ func main() {
 	var actions = os.Args[1]
 	var users = os.Args[2:]
 
-	switch strings.ToLower(actions) {
-	case "create":
-		createUsers(users)
-	case "update":
-		updateUsers(users)
-	case "delete":
-		deleteUsers(users)
-	case "list":
-		listUsers()
-	case "help":
-		printHelp()
-	default:
-		printHelp()
-	}
-}
-
-func createUsers(users []string) {
-
-}
-
-func updateUsers(users []string) {
-
-}
-
-func deleteUsers(users []string) {
-
-}
-
-func listUsers() {
-
-}
-
-func printHelp() {
-	help := `usage: wg-users [actions] [<users>]
-actions: 
-	create:	creates the user/users. It will create the config for the WireGuard client in the home root folder.
-		Example:
-			wg-users create foo bar
-	update:	updates the user/users. It will update the credentials of the user/users.
-		Example:
-			wg-users update foo bar
-	delete:	deletes the user/users. It 
-		Example:
-			wg-users delete foo bar
-	list: list the users of we have 
-		Example:
-			wg-users list`
-	fmt.Printf("%s\n", help)
+	routerAction(actions, users)
 }
 
 func checkingRequiredFolder() (bool, error) {
