@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 	"strconv"
@@ -89,7 +88,6 @@ func isRunningInRoot() (bool, error) {
 func checkingRequiredFiles() (bool, error) {
 	for _, filePath := range FILES {
 		if _, err := os.Stat(filePath); os.IsNotExist(err) {
-			log.Printf("file %s not exists\n", filePath)
 			theFile, fErr := os.OpenFile(filePath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
 			if fErr != nil {
 				return false, fErr
