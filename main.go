@@ -7,10 +7,13 @@ import (
 	"strconv"
 )
 
+// DIRS This Variable due to is that static and they are used in other sections
 var DIRS = []string{
 	"/etc/wireguard/",
 	"/root/wg-user/",
 }
+
+// FILES This Variable due to is that static and they are used in other sections
 var FILES = []string{
 	"/etc/wireguard/users.tsv",
 	"/etc/wireguard/wg0.conf",
@@ -70,7 +73,7 @@ func isRunningInRoot() (bool, error) {
 		return false, uErr
 	}
 
-	return i == 0, err
+	return i == 0, nil
 }
 
 func checkingRequiredFiles() (bool, error) {
