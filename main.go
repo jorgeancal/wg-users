@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"strconv"
+	"strings"
 )
 
 // DIRS This Variable due to is that static and they are used in other sections
@@ -16,8 +17,9 @@ var DIRS = []string{
 // FILES This Variable due to is that static and they are used in other sections
 var FILES = []string{
 	"/etc/wireguard/users.tsv",
-	"/etc/wireguard/wg0.conf",
 }
+
+var CIDR = "10.50.0.0/16"
 
 func main() {
 	if result, err := isRunningInRoot(); result == false {
@@ -82,6 +84,12 @@ func checkingRequiredFiles() (bool, error) {
 			theFile, fErr := os.OpenFile(filePath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
 			if fErr != nil {
 				return false, fErr
+			}
+			if strings.Contains(filePath, "users.tsv") {
+				_, err := theFile.WriteString("UserName\tIP\tCreation\n")
+				if err != nil {
+					return false, err
+				}
 			}
 			tErr := theFile.Close()
 			if tErr != nil {
