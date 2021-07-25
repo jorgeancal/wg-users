@@ -27,14 +27,14 @@ func setUpUsersIntoWireGuard(usersToAdd []string, users []User) {
 
 		ip, errGMNIPA := giveMeNextIPAvailable(users)
 		if errGMNIPA != nil {
-			fmt.Printf("There was an error creating the key for %s \n", u)
+			fmt.Printf("There was an error retrieveing the IP for %s \n", u)
 		}
-
-		cmd := exec.Command("wg", "set", "wg0", "peer", key, "allowed-ips", string(ip))
+		var command = "wg set wg0 peer " + key + " allowed-ips " + string(ip)
+		cmd := exec.Command("bash", "-c", command)
 
 		_, errO := cmd.Output()
 		if errO != nil {
-			fmt.Printf("There was an error setting up %s user\n", u)
+			fmt.Printf("There was an error setting up %s user - error :\n %v \n", u, errO)
 		}
 
 		newUser := User{u, ip, time.Now()}
@@ -85,9 +85,11 @@ func inc(ip net.IP) {
  * we are going to generate the Private and the Public Key for the User  and we will retrieve the public
  */
 func generateClientKeys(u string) (string, error) {
-	creationUserCmd := exec.Command("wg", "wg", "genkey", "|", "tee", "/root/wg-user/"+u, "|", "wg", "pubkey", ">", "/root/wg-user/"+u+".pub")
-	_, err := creationUserCmd.Output()
+	var command = "wg genkey | tee /root/wg-user/" + u + "| wg pubkey > /root/wg-user/" + u + ".pub"
 
+	creationUserCmd := exec.Command("bash", "-c", command)
+
+	_, err := creationUserCmd.Output()
 	if err != nil {
 		return "", err
 	}
