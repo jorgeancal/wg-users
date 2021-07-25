@@ -6,3 +6,9 @@ package main
 func listUsers() {
 
 }
+
+func getUsersList() []User {
+	var currentUsers []User
+
+	return currentUsers
+}
