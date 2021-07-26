@@ -19,6 +19,14 @@ var FILES = []string{
 	"/etc/wireguard/wg0.conf",
 }
 
+/*
+	@TODO - Check if it's a good idea use flag package
+	createCommand := flag.NewFlagSet("create", flag.ExitOnError)
+	deleteCommand := flag.NewFlagSet("delete", flag.ExitOnError)
+	updateCommand := flag.NewFlagSet("update", flag.ExitOnError)
+	listCommand := flag.NewFlagSet("list", flag.ExitOnError)
+
+*/
 func main() {
 	if result, err := isRunningInRoot(); result == false {
 		fmt.Printf("This program must be run as root!\n Error - %s", err)
