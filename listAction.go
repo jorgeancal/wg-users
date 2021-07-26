@@ -29,6 +29,7 @@ func getUsersList() []User {
 
 	if err != nil {
 		_ = fmt.Errorf("error reading the %s file", FILES[0])
+		os.Exit(-1)
 	}
 	scanner := bufio.NewScanner(tsvFile)
 	counter := 0
@@ -39,6 +40,7 @@ func getUsersList() []User {
 			creationTime, err := time.Parse(time.RFC822, columns[2])
 			if err != nil {
 				fmt.Print("There is something wrong in the tsv\n")
+				os.Exit(-1)
 			}
 			currentUsers = append(currentUsers, User{columns[0], columns[1], creationTime, columns[3], columns[4], columns[5]})
 		}
