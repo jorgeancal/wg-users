@@ -12,8 +12,6 @@ func routerAction(actions string, arguments []string) {
 		deleteUsers(arguments)
 	case "list":
 		listUsers()
-	case "help":
-		printHelp()
 	default:
 		printHelp()
 	}
