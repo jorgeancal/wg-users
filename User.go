@@ -1,12 +1,14 @@
 package main
 
 import (
-	"net"
 	"time"
 )
 
 type User struct {
-	name     string
-	ip       net.IP
-	creation time.Time
+	name         string
+	ip           string
+	creation     time.Time
+	publicKey    string
+	privateKey   string
+	presharedKey string
 }

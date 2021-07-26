@@ -11,15 +11,18 @@ import (
 // DIRS This Variable due to is that static and they are used in other sections
 var DIRS = []string{
 	"/etc/wireguard/",
-	"/root/wg-user/",
+	"/root/wg-users/",
+	"/root/wg-users/config",
 }
 
 // FILES This Variable due to is that static and they are used in other sections
 var FILES = []string{
 	"/etc/wireguard/users.tsv",
+	"/etc/wireguard/serverkey",
+	"/etc/wireguard/serverkey.pub",
 }
 
-var CIDR = "10.50.0.0/16"
+const CIDR = "10.51.0.0/24"
 
 func main() {
 	if result, err := isRunningInRoot(); result == false {
@@ -86,7 +89,7 @@ func checkingRequiredFiles() (bool, error) {
 				return false, fErr
 			}
 			if strings.Contains(filePath, "users.tsv") {
-				_, err := theFile.WriteString("UserName\tIP\tCreation\n")
+				_, err := theFile.WriteString("UserName\tIP\tCreation\tPublic Key\tPrivate Key\tPresharedKey\n")
 				if err != nil {
 					return false, err
 				}

@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"net"
 	"os"
 	"strings"
 	"time"
@@ -31,21 +30,20 @@ func getUsersList() []User {
 	if err != nil {
 		_ = fmt.Errorf("error reading the %s file", FILES[0])
 	}
-
 	scanner := bufio.NewScanner(tsvFile)
 	counter := 0
 	for scanner.Scan() {
-		if counter > 0 {
+		if counter >= 1 {
 			line := scanner.Text()
 			columns := strings.Split(line, "\t")
 			creationTime, err := time.Parse(time.RFC822, columns[2])
 			if err != nil {
-				fmt.Print("There is something wrong in the tsv")
+				fmt.Print("There is something wrong in the tsv\n")
 			}
-			currentUsers = append(currentUsers, User{columns[0], net.IP(columns[1]), creationTime})
+			currentUsers = append(currentUsers, User{columns[0], columns[1], creationTime, columns[3], columns[4], columns[5]})
 		}
 		counter++
-	}
 
+	}
 	return currentUsers
 }
