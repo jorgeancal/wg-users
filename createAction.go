@@ -49,7 +49,7 @@ func setUpUsersIntoWireGuard(usersToAdd []string, users []User) {
 			fmt.Printf("There was an error retrieveing the IP for %s \n", username)
 		}
 		if ip != nil {
-			var command = "wg set wg0 peer '" + newUser.publicKey + "' allowed-ips " + ip.String() + "/32"
+			var command = "wg set wg0 peer '" + newUser.publicKey + "' preshared-key '" + newUser.presharedKey + "' allowed-ips " + ip.String() + "/32"
 			cmd := exec.Command("bash", "-c", command)
 
 			_, errO := cmd.Output()
