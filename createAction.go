@@ -27,7 +27,6 @@ PersistentKeepalive = 15
  */
 func createUsers(usersToAdd []string) {
 	var currentUsers = getUsersList()
-	fmt.Printf("%+v", currentUsers)
 	usersToAdd = checkUserList(currentUsers, usersToAdd)
 	if len(usersToAdd) > 0 {
 		setUpUsersIntoWireGuard(usersToAdd, currentUsers)
@@ -41,12 +40,14 @@ func setUpUsersIntoWireGuard(usersToAdd []string, users []User) {
 		newUser, errGCK := generateClientKeys(newUser)
 		if errGCK != nil {
 			fmt.Printf("There was an error creating the key for %s \n", username)
+			os.Exit(-1)
 		}
 
 		ip, errGMNIPA := giveMeNextIPAvailable(users)
 		newUser.ip = ip.String()
 		if errGMNIPA != nil {
 			fmt.Printf("There was an error retrieveing the IP for %s \n", username)
+			os.Exit(-1)
 		}
 		if ip != nil {
 			var command = "wg set wg0 peer '" + newUser.publicKey + "' preshared-key '" + newUser.presharedKey + "' allowed-ips " + ip.String() + "/32"
@@ -55,6 +56,7 @@ func setUpUsersIntoWireGuard(usersToAdd []string, users []User) {
 			_, errO := cmd.Output()
 			if errO != nil {
 				fmt.Printf("There was an error setting up %s user - error :\n %v \n", username, errO)
+				os.Exit(-1)
 			}
 
 			err := registerUserIntoCSV(newUser)
@@ -65,6 +67,7 @@ func setUpUsersIntoWireGuard(usersToAdd []string, users []User) {
 			err = createWGQuickConfig(newUser)
 			if err == nil {
 				fmt.Println("Users added correctly")
+				os.Exit(-1)
 			}
 		}
 	}
@@ -94,7 +97,7 @@ func registerUserIntoCSV(user User) error {
 }
 
 func giveMeNextIPAvailable(userList []User) (net.IP, error) {
-	ip, ipNet, err := net.ParseCIDR(CIDR)
+	ip, ipNet, err := net.ParseCIDR(wg0["Address"])
 	if err != nil {
 		return nil, err
 	}

@@ -18,13 +18,19 @@ var DIRS = []string{
 // FILES This Variable due to is that static and they are used in other sections
 var FILES = []string{
 	"/etc/wireguard/users.tsv",
+	"/etc/wireguard/wg0.conf",
 	"/etc/wireguard/serverkey",
 	"/etc/wireguard/serverkey.pub",
 }
 
-const CIDR = "10.51.0.0/24"
+var wg0 = make(map[string]string)
 
 func main() {
+	err := getWGServer()
+	if err != nil {
+		fmt.Printf("There was a problem reading the config.")
+		os.Exit(1)
+	}
 	if result, err := isRunningInRoot(); result == false {
 		fmt.Printf("This program must be run as root!\n Error - %s", err)
 		os.Exit(1)
@@ -46,9 +52,9 @@ func main() {
 	}
 
 	var actions = os.Args[1]
-	var users = os.Args[2:]
+	var arguments = os.Args[2:]
 
-	routerAction(actions, users)
+	routerAction(actions, arguments)
 }
 
 func checkingRequiredFolder() (bool, error) {
