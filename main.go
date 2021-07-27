@@ -17,7 +17,7 @@ var DIRS = []string{
 
 // FILES This Variable due to is that static and they are used in other sections
 var FILES = []string{
-	"/etc/wireguard/users.tsv",
+	"/etc/wg-users/users.tsv",
 	"/etc/wireguard/wg0.conf",
 	"/etc/wireguard/serverkey",
 	"/etc/wireguard/serverkey.pub",
