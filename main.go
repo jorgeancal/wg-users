@@ -11,19 +11,19 @@ import (
 // DIRS This Variable due to is that static and they are used in other sections
 var DIRS = []string{
 	"/etc/wireguard/",
-	"/root/wg-users/",
-	"/root/wg-users/config",
+	"/etc/wg-users/",
+	"/etc/wg-users/config",
 }
 
 // FILES This Variable due to is that static and they are used in other sections
 var FILES = []string{
 	"/etc/wireguard/users.tsv",
+	"/etc/wireguard/wg0.conf",
 	"/etc/wireguard/serverkey",
 	"/etc/wireguard/serverkey.pub",
-	"/etc/wireguard/wg0.conf",
 }
 
-var wg0 = make(map[string]string)
+var wg0 map[string]string
 
 /*
 	@TODO - Check if it's a good idea use flag package

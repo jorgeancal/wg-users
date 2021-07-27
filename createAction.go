@@ -18,7 +18,7 @@ DNS = 10.0.0.121,1.1.1.1
 PublicKey = $PublicKey
 PresharedKey = $PresharedKey
 AllowedIPs = 0.0.0.0/0
-Endpoint =  $endpoint:51820
+Endpoint =  $endpoint
 PersistentKeepalive = 15
 `
 
@@ -50,9 +50,8 @@ func setUpUsersIntoWireGuard(usersToAdd []string, users []User) {
 			os.Exit(-1)
 		}
 		if ip != nil {
-			var command = "wg set wg0 peer '" + newUser.publicKey + "' preshared-key '" + newUser.presharedKey + "' allowed-ips " + ip.String() + "/32"
+			var command = "wg set wg0 peer '" + newUser.publicKey + "' preshared-key /etc/wg-users/" + newUser.name + "/" + newUser.name + ".psk allowed-ips " + ip.String()
 			cmd := exec.Command("bash", "-c", command)
-
 			_, errO := cmd.Output()
 			if errO != nil {
 				fmt.Printf("There was an error setting up %s user - error :\n %v \n", username, errO)
@@ -79,12 +78,21 @@ func createWGQuickConfig(user User) error {
 	userConfig = strings.Replace(userConfig, "$PrivateKey", user.privateKey, 1)
 	userConfig = strings.Replace(userConfig, "$PublicKey", user.publicKey, 1)
 	userConfig = strings.Replace(userConfig, "$PresharedKey", user.presharedKey, 1)
-	userConfig = strings.Replace(userConfig, "$endpoint", "0.0.0.0", 1)
-	f, err := os.OpenFile("/root/wg-users/config/"+user.name+"-wg0.conf", os.O_CREATE|os.O_RDWR, 0600)
+	userConfig = strings.Replace(userConfig, "$endpoint", getEndPoint()+":"+wg0["ListenPort"], 1)
+	f, err := os.OpenFile("/etc/wg-users/"+user.name+"/"+user.name+"-wg0.conf", os.O_CREATE|os.O_RDWR, 0600)
 	if _, err = f.WriteString(userConfig); err != nil {
 		return err
 	}
 	return nil
+}
+
+func getEndPoint() string {
+	c := exec.Command("cat", DIRS[2]+"/endpoint.conf")
+	outputC, err := c.Output()
+	if err != nil {
+		return ""
+	}
+	return string(outputC[:len(outputC)-1])
 }
 
 func registerUserIntoCSV(user User) error {
@@ -138,42 +146,43 @@ func inc(ip net.IP) {
  * we are going to generate the Private and the Public Key for the User  and we will retrieve the public
  */
 func generateClientKeys(user User) (User, error) {
+	userFolder := "/etc/wg-users/" + user.name + "/"
+	_, err := os.Stat(userFolder)
+	if os.IsNotExist(err) {
+		errDir := os.MkdirAll(userFolder, 0700)
+		if errDir != nil {
+			return user, errDir
+		}
+	}
 
-	var command = "wg genkey | tee /root/wg-users/" + user.name + "| wg pubkey > /root/wg-users/" + user.name + ".pub && wg genpsk > /root/wg-users/" + user.name + ".psk"
-
+	var command = "wg genkey | tee " + userFolder + user.name + " | wg pubkey > " + userFolder + user.name + ".pub && wg genpsk > " + userFolder + user.name + ".psk"
 	creationUserCmd := exec.Command("bash", "-c", command)
-
-	_, err := creationUserCmd.Output()
+	_, err = creationUserCmd.Output()
 	if err != nil {
 		return user, err
 	}
 
-	cmd := exec.Command("cat", "/root/wg-users/"+user.name+".pub")
+	cmd := exec.Command("cat", userFolder+user.name+".pub")
 	output, err := cmd.Output()
-
 	if err != nil {
 		return user, err
 	}
-
 	user.publicKey = string(output[:len(output)-1])
 
-	md := exec.Command("cat", "/root/wg-users/"+user.name+"")
+	md := exec.Command("cat", userFolder+user.name)
 	outputP, err := md.Output()
-
 	if err != nil {
 		return user, err
 	}
-
 	user.privateKey = string(outputP[:len(outputP)-1])
 
-	c := exec.Command("cat", "/root/wg-users/"+user.name+".psk")
+	c := exec.Command("cat", userFolder+user.name+".psk")
 	outputC, err := c.Output()
-
 	if err != nil {
 		return user, err
 	}
-
 	user.presharedKey = string(outputC[:len(outputC)-1])
+
 	return user, nil
 }
 

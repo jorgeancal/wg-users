@@ -1,6 +1,8 @@
 package main
 
-import "strings"
+import (
+	"strings"
+)
 
 func routerAction(actions string, arguments []string) {
 	switch strings.ToLower(actions) {
@@ -12,6 +14,8 @@ func routerAction(actions string, arguments []string) {
 		deleteUsers(arguments)
 	case "list":
 		listUsers()
+	case "config":
+		configEndPoint(arguments)
 	default:
 		printHelp()
 	}
