@@ -83,6 +83,12 @@ func createWGQuickConfig(user User) error {
 	if _, err = f.WriteString(userConfig); err != nil {
 		return err
 	}
+
+	c := exec.Command("qrencode", "-o /etc/wg-users/"+user.name+"/"+user.name+".png -t png -Sv 40 < /etc/wg-users/"+user.name+"/"+user.name+"-wg0.conf")
+	_, err = c.Output()
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
