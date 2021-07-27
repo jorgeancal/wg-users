@@ -12,7 +12,20 @@ import (
  * list Users
  */
 func listUsers() {
-
+	usersList := getUsersList()
+	if len(usersList) != 0 {
+		var message = "\nThere is %v user:\n\n"
+		if len(usersList) > 1 {
+			message = "\nThere are %v users:\n\n"
+		}
+		fmt.Printf(message, len(usersList))
+		fmt.Println("\tUser Name  \t   IP")
+		for _, user := range usersList {
+			fmt.Printf("\t%v\t%v\n", user.name, user.ip)
+		}
+	} else {
+		fmt.Println("There is no users, mate! Hurry up and create the first user")
+	}
 }
 
 func getUsersList() []User {
