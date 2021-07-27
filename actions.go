@@ -1,19 +1,21 @@
 package main
 
-import "strings"
+import (
+	"strings"
+)
 
-func routerAction(actions string, users []string) {
+func routerAction(actions string, arguments []string) {
 	switch strings.ToLower(actions) {
 	case "create":
-		createUsers(users)
+		createUsers(arguments)
 	case "update":
-		updateUsers(users)
+		updateUsers(arguments)
 	case "delete":
-		deleteUsers(users)
+		deleteUsers(arguments)
 	case "list":
 		listUsers()
-	case "help":
-		printHelp()
+	case "config":
+		configEndPoint(arguments)
 	default:
 		printHelp()
 	}

@@ -5,19 +5,25 @@ import (
 	"os"
 	"os/exec"
 	"strconv"
+	"strings"
 )
 
 // DIRS This Variable due to is that static and they are used in other sections
 var DIRS = []string{
 	"/etc/wireguard/",
-	"/root/wg-user/",
+	"/etc/wg-users/",
+	"/etc/wg-users/config",
 }
 
 // FILES This Variable due to is that static and they are used in other sections
 var FILES = []string{
-	"/etc/wireguard/users.tsv",
+	"/etc/wg-users/users.tsv",
 	"/etc/wireguard/wg0.conf",
+	"/etc/wireguard/serverkey",
+	"/etc/wireguard/serverkey.pub",
 }
+
+var wg0 map[string]string
 
 /*
 	@TODO - Check if it's a good idea use flag package
@@ -28,6 +34,11 @@ var FILES = []string{
 
 */
 func main() {
+	err := getWGServer()
+	if err != nil {
+		fmt.Printf("There was a problem reading the config.")
+		os.Exit(1)
+	}
 	if result, err := isRunningInRoot(); result == false {
 		fmt.Printf("This program must be run as root!\n Error - %s", err)
 		os.Exit(1)
@@ -49,9 +60,9 @@ func main() {
 	}
 
 	var actions = os.Args[1]
-	var users = os.Args[2:]
+	var arguments = os.Args[2:]
 
-	routerAction(actions, users)
+	routerAction(actions, arguments)
 }
 
 func checkingRequiredFolder() (bool, error) {
@@ -90,6 +101,12 @@ func checkingRequiredFiles() (bool, error) {
 			theFile, fErr := os.OpenFile(filePath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
 			if fErr != nil {
 				return false, fErr
+			}
+			if strings.Contains(filePath, "users.tsv") {
+				_, err := theFile.WriteString("UserName\tIP\tCreation\tPublic Key\tPrivate Key\tPresharedKey\n")
+				if err != nil {
+					return false, err
+				}
 			}
 			tErr := theFile.Close()
 			if tErr != nil {
