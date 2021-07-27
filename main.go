@@ -34,16 +34,14 @@ var wg0 map[string]string
 
 */
 func main() {
-	err := getWGServer()
-	if err != nil {
-		fmt.Printf("There was a problem reading the config.")
-		os.Exit(1)
-	}
 	if result, err := isRunningInRoot(); result == false {
 		fmt.Printf("This program must be run as root!\n Error - %s", err)
 		os.Exit(1)
 	}
-
+	if err := getWGServer(); err != nil {
+		fmt.Printf("There was a problem reading the config.")
+		os.Exit(1)
+	}
 	if result, err := checkingRequiredFolder(); result == false {
 		fmt.Printf("%s \nThere was an error creating the files", err)
 		os.Exit(1)
