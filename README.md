@@ -2,7 +2,8 @@
 
 ## At the moment I've got the creation of users in wireguard 
 
-
+```
+$ wg-users help
 usage: wg-users [actions] [<users>]
 actions: 
 	create:	creates the user/users. It will create the config for the WireGuard client in the home root folder.
@@ -17,9 +18,10 @@ actions:
 	list: list the users of we have 
 		Example:
 			wg-users list
-  config: list the users of we have 
+ 	config: list the users of we have 
 		Example:
 			wg-users config endpoint 111.222.333.444
+```
 
 # wg-users
 
