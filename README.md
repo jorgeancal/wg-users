@@ -1,6 +1,8 @@
 # It's in going development
 
-## At the moment I've got the creation of users in wireguard 
+ At the moment I've got the creation of users in wireguard. 
+ 
+ # Usage example
 
 ```
 $ wg-users help
