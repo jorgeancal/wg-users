@@ -12,7 +12,7 @@ import (
 // DIRS This Variable due to is that static and they are used in other sections
 var DIRS = []string{
 	"/etc/wireguard/",
-	"c",
+	"/etc/wg-users/",
 	"/etc/wg-users/config",
 }
 
