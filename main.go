@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 	"os/exec"
@@ -25,17 +26,9 @@ var FILES = []string{
 
 var wg0 map[string]string
 
-/*
-	@TODO - Check if it's a good idea use flag package
-	createCommand := flag.NewFlagSet("create", flag.ExitOnError)
-	deleteCommand := flag.NewFlagSet("delete", flag.ExitOnError)
-	updateCommand := flag.NewFlagSet("update", flag.ExitOnError)
-	listCommand := flag.NewFlagSet("list", flag.ExitOnError)
-
-*/
 func main() {
-	if result, err := isRunningInRoot(); result == false {
-		fmt.Printf("This program must be run as root!\n Error - %s", err)
+	if result, _ := isRunningInRoot(); result == false {
+		fmt.Printf("This program must be run as root!\n")
 		os.Exit(1)
 	}
 	if err := getWGServer(); err != nil {
@@ -52,15 +45,71 @@ func main() {
 		os.Exit(1)
 	}
 
+	var endpoint string
+	createCommand := flag.NewFlagSet("create", flag.ExitOnError)
+	deleteCommand := flag.NewFlagSet("delete", flag.ExitOnError)
+	updateCommand := flag.NewFlagSet("update", flag.ExitOnError)
+	listCommand := flag.NewFlagSet("list", flag.ExitOnError)
+	configCommand := flag.NewFlagSet("config", flag.ExitOnError)
+	configCommand.StringVar(&endpoint, "e", "", "This is the external IP of the server.")
+
 	if len(os.Args) <= 1 {
-		printHelp()
-		os.Exit(1)
+		printHelp(createCommand, deleteCommand, updateCommand, listCommand, configCommand)
+		os.Exit(-2)
 	}
 
 	var actions = os.Args[1]
-	var arguments = os.Args[2:]
 
-	routerAction(actions, arguments)
+	switch strings.ToLower(actions) {
+	case "create":
+		if err := createCommand.Parse(os.Args); err != nil {
+			createCommand.PrintDefaults()
+			return
+		}
+		createUsers(os.Args[2:])
+	case "update":
+		if err := updateCommand.Parse(os.Args); err != nil {
+			updateCommand.PrintDefaults()
+			return
+		}
+		updateUsers(os.Args[2:])
+	case "delete":
+		if err := deleteCommand.Parse(os.Args); err != nil {
+			deleteCommand.PrintDefaults()
+			return
+		}
+		deleteUsers(os.Args[2:])
+	case "list":
+		if err := listCommand.Parse(os.Args); err != nil {
+			listCommand.PrintDefaults()
+			return
+		}
+		listUsers()
+	case "config":
+		if err := configCommand.Parse(os.Args); err != nil {
+			configCommand.PrintDefaults()
+			return
+		}
+		configEndPoint(endpoint)
+	default:
+		printHelp(createCommand, deleteCommand, updateCommand, listCommand, configCommand)
+	}
+
+}
+
+func printHelp(createCommand *flag.FlagSet, deleteCommand *flag.FlagSet, updateCommand *flag.FlagSet, listCommand *flag.FlagSet,
+	configCommand *flag.FlagSet) {
+	fmt.Printf(HeadHelp)
+	fmt.Printf(CreateHelp)
+	createCommand.PrintDefaults()
+	fmt.Printf(DeleteHelp)
+	deleteCommand.PrintDefaults()
+	fmt.Printf(UpdateHelp)
+	updateCommand.PrintDefaults()
+	fmt.Printf(ListHelp)
+	listCommand.PrintDefaults()
+	fmt.Printf(ConfigHelp)
+	configCommand.PrintDefaults()
 }
 
 func checkingRequiredFolder() (bool, error) {

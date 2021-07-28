@@ -48,20 +48,15 @@ func getServerPublicKey() string {
 	return string(outputC[:len(outputC)-1])
 }
 
-func configEndPoint(arguments []string) {
-	var isEndPoint = false
-	for _, argument := range arguments {
-		if strings.Contains(argument, "endpoint") {
-			isEndPoint = true
-		}
-		if isEndPoint {
-			var command = "echo '" + argument + "' > " + DIRS[2] + "/endpoint.conf"
-			cmd := exec.Command("bash", "-c", command)
-			_, errO := cmd.Output()
-			if errO != nil {
-				fmt.Printf("Error setting endpoint \n %v \n", errO)
-				os.Exit(-1)
-			}
+
+func configEndPoint(endpoint string) {
+	if endpoint != "" {
+		var command = "echo '" + endpoint + "' > " + DIRS[2] + "/endpoint.conf"
+		cmd := exec.Command("bash", "-c", command)
+		_, errO := cmd.Output()
+		if errO != nil {
+			fmt.Printf("Error setting endpoint \n %v \n", errO)
+			os.Exit(-1)
 		}
 	}
 }

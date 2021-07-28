@@ -37,6 +37,7 @@ func setUpUsersIntoWireGuard(usersToAdd []string, users []User) {
 	for _, username := range usersToAdd {
 		newUser := User{}
 		newUser.name = username
+
 		newUser, errGCK := generateClientKeys(newUser)
 		if errGCK != nil {
 			fmt.Printf("There was an error creating the key for %s \n", username)
@@ -44,31 +45,36 @@ func setUpUsersIntoWireGuard(usersToAdd []string, users []User) {
 		}
 
 		ip, errGMNIPA := giveMeNextIPAvailable(users)
-		newUser.ip = ip.String()
-		if errGMNIPA != nil {
+
+		if errGMNIPA != nil || ip == nil {
 			fmt.Printf("There was an error retrieveing the IP for %s \n", username)
 			os.Exit(-1)
 		}
-		if ip != nil {
-			var command = "wg set wg0 peer '" + newUser.publicKey + "' preshared-key /etc/wg-users/" + newUser.name + "/" + newUser.name + ".psk allowed-ips " + ip.String()
-			cmd := exec.Command("bash", "-c", command)
-			_, errO := cmd.Output()
-			if errO != nil {
-				fmt.Printf("There was an error setting up %s user - error :\n %v \n", username, errO)
-				os.Exit(-1)
-			}
 
-			err := registerUserIntoCSV(newUser)
-			if err == nil {
-				users = append(users, newUser)
-			}
+		newUser.ip = ip.String()
 
-			err = createWGQuickConfig(newUser)
-			if err == nil {
-				fmt.Println("Users added correctly")
-				os.Exit(-1)
-			}
+		var command = "wg set wg0 peer '" + newUser.publicKey + "' preshared-key /etc/wg-users/" + newUser.name + "/" + newUser.name + ".psk allowed-ips " + ip.String()
+		cmd := exec.Command("bash", "-c", command)
+		_, errO := cmd.Output()
+		if errO != nil {
+			fmt.Printf("There was an error setting up %s user - error :\n %v \n", username, errO)
+			os.Exit(-1)
 		}
+
+		err := registerUserIntoCSV(newUser)
+		if err == nil {
+			users = append(users, newUser)
+		} else {
+			fmt.Printf("error in the csv %v", err)
+		}
+
+		err = createWGQuickConfig(newUser)
+		if err == nil {
+			fmt.Printf("User %s added correctly\n", newUser.name)
+		} else {
+			fmt.Printf("we had some problems creating %s user\n", newUser.name)
+		}
+
 	}
 }
 
@@ -102,11 +108,13 @@ func getEndPoint() string {
 }
 
 func registerUserIntoCSV(user User) error {
-	f, err := os.OpenFile(FILES[0], os.O_APPEND|os.O_WRONLY, 0600)
+	f, err := os.OpenFile(FILES[0], os.O_APPEND|os.O_RDWR, 0600)
 	var lineToWrite = user.name + "\t" + user.ip + "\t" + user.creation.Format(time.RFC822) + "\t" + user.publicKey + "\t" + user.privateKey + "\t" + user.presharedKey + "\n"
 	if _, err = f.WriteString(lineToWrite); err != nil {
 		return err
 	}
+
+	f.Close()
 	return nil
 }
 
@@ -160,9 +168,9 @@ func generateClientKeys(user User) (User, error) {
 			return user, errDir
 		}
 	}
-
 	var command = "wg genkey | tee " + userFolder + user.name + " | wg pubkey > " + userFolder + user.name + ".pub && wg genpsk > " + userFolder + user.name + ".psk"
 	creationUserCmd := exec.Command("bash", "-c", command)
+	user.creation = time.Now()
 	_, err = creationUserCmd.Output()
 	if err != nil {
 		return user, err
