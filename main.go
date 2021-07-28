@@ -26,14 +26,6 @@ var FILES = []string{
 
 var wg0 map[string]string
 
-/*
-	@TODO - Check if it's a good idea use flag package
-	createCommand := flag.NewFlagSet("create", flag.ExitOnError)
-	deleteCommand := flag.NewFlagSet("delete", flag.ExitOnError)
-	updateCommand := flag.NewFlagSet("update", flag.ExitOnError)
-	listCommand := flag.NewFlagSet("list", flag.ExitOnError)
-
-*/
 func main() {
 	if result, err := isRunningInRoot(); result == false {
 		fmt.Printf("This program must be run as root!\n Error - %s", err)
@@ -57,7 +49,6 @@ func main() {
 	deleteCommand := flag.NewFlagSet("delete", flag.ExitOnError)
 	updateCommand := flag.NewFlagSet("update", flag.ExitOnError)
 	listCommand := flag.NewFlagSet("list", flag.ExitOnError)
-
 	configCommand := flag.NewFlagSet("config", flag.ExitOnError)
 	var endpoint string
 	configCommand.StringVar(&endpoint, "e", "", "This is the external IP of the server.")
@@ -108,17 +99,16 @@ func main() {
 
 func printHelp(createCommand *flag.FlagSet, deleteCommand *flag.FlagSet, updateCommand *flag.FlagSet, listCommand *flag.FlagSet,
 	configCommand *flag.FlagSet) {
-	fmt.Println(HeadHelp)
-	fmt.Println()
-	fmt.Println(CreateHelp)
+	fmt.Printf(HeadHelp)
+	fmt.Printf(CreateHelp)
 	createCommand.PrintDefaults()
-	fmt.Println(DeleteHelp)
+	fmt.Printf(DeleteHelp)
 	deleteCommand.PrintDefaults()
-	fmt.Println(UpdateHelp)
+	fmt.Printf(UpdateHelp)
 	updateCommand.PrintDefaults()
-	fmt.Println(ListHelp)
+	fmt.Printf(ListHelp)
 	listCommand.PrintDefaults()
-	fmt.Println(ConfigHelp)
+	fmt.Printf(ConfigHelp)
 	configCommand.PrintDefaults()
 }
 
