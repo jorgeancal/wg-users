@@ -76,7 +76,7 @@ func createWGQuickConfig(user User) error {
 	userConfig := wgQuickConf
 	userConfig = strings.Replace(userConfig, "$address", user.ip, 1)
 	userConfig = strings.Replace(userConfig, "$PrivateKey", user.privateKey, 1)
-	userConfig = strings.Replace(userConfig, "$PublicKey", user.publicKey, 1)
+	userConfig = strings.Replace(userConfig, "$PublicKey", wg0["ServerPublicKey"], 1)
 	userConfig = strings.Replace(userConfig, "$PresharedKey", user.presharedKey, 1)
 	userConfig = strings.Replace(userConfig, "$endpoint", getEndPoint()+":"+wg0["ListenPort"], 1)
 	f, err := os.OpenFile("/etc/wg-users/"+user.name+"/"+user.name+"-wg0.conf", os.O_CREATE|os.O_RDWR, 0600)

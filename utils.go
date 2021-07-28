@@ -27,6 +27,7 @@ func getWGServer() error {
 			wg0[strings.TrimSpace(value[0])] = strings.TrimSpace(value[1])
 		}
 	}
+	wg0["ServerPublicKey"] = getServerPublicKey()
 	defer func(configFile *os.File) {
 		err := configFile.Close()
 		if err != nil {
@@ -35,6 +36,16 @@ func getWGServer() error {
 	}(configFile)
 
 	return nil
+}
+
+func getServerPublicKey() string {
+	c := exec.Command("cat", FILES[3])
+	outputC, err := c.Output()
+	if err != nil {
+		fmt.Println("Error reading the server public key")
+		os.Exit(-1)
+	}
+	return string(outputC[:len(outputC)-1])
 }
 
 func configEndPoint(arguments []string) {
