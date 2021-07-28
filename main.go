@@ -12,7 +12,7 @@ import (
 // DIRS This Variable due to is that static and they are used in other sections
 var DIRS = []string{
 	"/etc/wireguard/",
-	"/etc/wg-users/",
+	"c",
 	"/etc/wg-users/config",
 }
 
@@ -27,8 +27,8 @@ var FILES = []string{
 var wg0 map[string]string
 
 func main() {
-	if result, err := isRunningInRoot(); result == false {
-		fmt.Printf("This program must be run as root!\n Error - %s", err)
+	if result, _ := isRunningInRoot(); result == false {
+		fmt.Printf("This program must be run as root!\n")
 		os.Exit(1)
 	}
 	if err := getWGServer(); err != nil {
@@ -45,12 +45,12 @@ func main() {
 		os.Exit(1)
 	}
 
+	var endpoint string
 	createCommand := flag.NewFlagSet("create", flag.ExitOnError)
 	deleteCommand := flag.NewFlagSet("delete", flag.ExitOnError)
 	updateCommand := flag.NewFlagSet("update", flag.ExitOnError)
 	listCommand := flag.NewFlagSet("list", flag.ExitOnError)
 	configCommand := flag.NewFlagSet("config", flag.ExitOnError)
-	var endpoint string
 	configCommand.StringVar(&endpoint, "e", "", "This is the external IP of the server.")
 
 	if len(os.Args) <= 1 {
@@ -66,19 +66,19 @@ func main() {
 			createCommand.PrintDefaults()
 			return
 		}
-		createUsers(createCommand.Args())
+		createUsers(os.Args[2:])
 	case "update":
 		if err := updateCommand.Parse(os.Args); err != nil {
 			updateCommand.PrintDefaults()
 			return
 		}
-		updateUsers(updateCommand.Args())
+		updateUsers(os.Args[2:])
 	case "delete":
 		if err := deleteCommand.Parse(os.Args); err != nil {
 			deleteCommand.PrintDefaults()
 			return
 		}
-		deleteUsers(deleteCommand.Args())
+		deleteUsers(os.Args[2:])
 	case "list":
 		if err := listCommand.Parse(os.Args); err != nil {
 			listCommand.PrintDefaults()
