@@ -9,7 +9,8 @@ import (
 	"time"
 )
 
-const wgQuickConf = `[Interface]
+const (
+	WGClientQuickConf = `[Interface]
 Address = $address
 PrivateKey = $PrivateKey
 DNS = 10.0.0.121,1.1.1.1
@@ -21,6 +22,13 @@ AllowedIPs = 0.0.0.0/0
 Endpoint =  $endpoint
 PersistentKeepalive = 15
 `
+	WGPeerQuickConf = `
+[Peer]
+PublicKey = $PublicKey
+PresharedKey = $PresharedKey
+AllowedIPs = $address/32
+`
+)
 
 /**
  * User Creation
@@ -68,6 +76,12 @@ func setUpUsersIntoWireGuard(usersToAdd []string, users []User) {
 			fmt.Printf("error in the csv %v", err)
 		}
 
+		err = registerUserIntoTheInterface(newUser)
+		if err == nil {
+			users = append(users, newUser)
+		} else {
+			fmt.Printf("error in the csv %v", err)
+		}
 		err = createWGQuickConfig(newUser)
 		if err == nil {
 			fmt.Printf("User %s added correctly\n", newUser.name)
@@ -79,7 +93,7 @@ func setUpUsersIntoWireGuard(usersToAdd []string, users []User) {
 }
 
 func createWGQuickConfig(user User) error {
-	userConfig := wgQuickConf
+	userConfig := WGClientQuickConf
 	userConfig = strings.Replace(userConfig, "$address", user.ip, 1)
 	userConfig = strings.Replace(userConfig, "$PrivateKey", user.privateKey, 1)
 	userConfig = strings.Replace(userConfig, "$PublicKey", wg0["ServerPublicKey"], 1)
@@ -111,6 +125,20 @@ func registerUserIntoCSV(user User) error {
 	f, err := os.OpenFile(FILES[0], os.O_APPEND|os.O_RDWR, 0600)
 	var lineToWrite = user.name + "\t" + user.ip + "\t" + user.creation.Format(time.RFC822) + "\t" + user.publicKey + "\t" + user.privateKey + "\t" + user.presharedKey + "\n"
 	if _, err = f.WriteString(lineToWrite); err != nil {
+		return err
+	}
+
+	f.Close()
+	return nil
+}
+
+func registerUserIntoTheInterface(user User) error {
+	f, err := os.OpenFile(FILES[1], os.O_APPEND|os.O_RDWR, 0600)
+	userConfig := WGPeerQuickConf
+	userConfig = strings.Replace(userConfig, "$address", user.ip, 1)
+	userConfig = strings.Replace(userConfig, "$PublicKey", user.publicKey, 1)
+	userConfig = strings.Replace(userConfig, "$PresharedKey", user.presharedKey, 1)
+	if _, err = f.WriteString(userConfig); err != nil {
 		return err
 	}
 
