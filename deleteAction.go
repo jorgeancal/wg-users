@@ -31,8 +31,5 @@ func deleteUsers(users []string) {
 
 // we are going to create a wg0-new.conf then mv the old one to the new one.
 func removeLineInCSV(users []string) {
-	// remove this...
-	for _, _ = range users {
 
-	}
 }
