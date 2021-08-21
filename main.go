@@ -56,24 +56,28 @@ func main() {
 			updateCommand.PrintDefaults()
 			return
 		}
+		loadMandatoryConfig()
 		updateUsers(os.Args[2:])
 	case "delete":
 		if err := deleteCommand.Parse(os.Args); err != nil {
 			deleteCommand.PrintDefaults()
 			return
 		}
+		loadMandatoryConfig()
 		deleteUsers(os.Args[2:])
 	case "list":
 		if err := listCommand.Parse(os.Args); err != nil {
 			listCommand.PrintDefaults()
 			return
 		}
+		loadMandatoryConfig()
 		listUsers()
 	case "config":
 		if err := configCommand.Parse(os.Args); err != nil {
 			configCommand.PrintDefaults()
 			return
 		}
+		loadMandatoryConfig()
 		configEndPoint(endpoint)
 	default:
 		printHelp(createCommand, deleteCommand, updateCommand, listCommand, configCommand)
