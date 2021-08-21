@@ -9,4 +9,4 @@ const CreateHelp = " create:\tcreates the user/users. It will create the config 
 const DeleteHelp = " delete:\tdeletes the user/users. It will remove the users from WireGuard\n\n"
 const UpdateHelp = " update:\tupdates the user/users. It will delete and create again the credentials of the user/users.\n\n"
 const ListHelp = " list:\t\tlist the users of we have\n\n"
-const ConfigHelp = " config:\tYou will be able to edit some values from the clieent's WG0. Flags:\n"
+const ConfigHelp = " config:\tYou will be able to edit some values for the config. Flags:\n"
