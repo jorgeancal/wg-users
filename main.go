@@ -27,23 +27,6 @@ var FILES = []string{
 var wg0 map[string]string
 
 func main() {
-	if result, _ := isRunningInRoot(); result == false {
-		fmt.Printf("This program must be run as root!\n")
-		os.Exit(1)
-	}
-	if err := getWGServer(); err != nil {
-		fmt.Printf("There was a problem reading the config.")
-		os.Exit(1)
-	}
-	if result, err := checkingRequiredFolder(); result == false {
-		fmt.Printf("%s \nThere was an error creating the files", err)
-		os.Exit(1)
-	}
-
-	if result, err := checkingRequiredFiles(); result == false {
-		fmt.Printf("%s \nThere was an error creating the files", err)
-		os.Exit(1)
-	}
 
 	var endpoint string
 	createCommand := flag.NewFlagSet("create", flag.ExitOnError)
@@ -66,6 +49,7 @@ func main() {
 			createCommand.PrintDefaults()
 			return
 		}
+		loadMandatoryConfig()
 		createUsers(os.Args[2:])
 	case "update":
 		if err := updateCommand.Parse(os.Args); err != nil {
@@ -95,6 +79,26 @@ func main() {
 		printHelp(createCommand, deleteCommand, updateCommand, listCommand, configCommand)
 	}
 
+}
+
+func loadMandatoryConfig() {
+	if result, _ := isRunningInRoot(); result == false {
+		fmt.Printf("This program must be run as root!\n")
+		os.Exit(1)
+	}
+	if err := getWGServer(); err != nil {
+		fmt.Printf("There was a problem reading the config.")
+		os.Exit(1)
+	}
+	if result, err := checkingRequiredFolder(); result == false {
+		fmt.Printf("%s \nThere was an error creating the files", err)
+		os.Exit(1)
+	}
+
+	if result, err := checkingRequiredFiles(); result == false {
+		fmt.Printf("%s \nThere was an error creating the files", err)
+		os.Exit(1)
+	}
 }
 
 func printHelp(createCommand *flag.FlagSet, deleteCommand *flag.FlagSet, updateCommand *flag.FlagSet, listCommand *flag.FlagSet,

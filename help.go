@@ -2,7 +2,8 @@ package main
 
 const HeadHelp = `usage: wg-users [actions] [<users>]
 
-[actions]:`
+[actions]:
+`
 
 const CreateHelp = " create:\tcreates the user/users. It will create the config for the WireGuard client in the home root folder.\n\n"
 const DeleteHelp = " delete:\tdeletes the user/users. It will remove the users from WireGuard\n\n"
